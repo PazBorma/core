@@ -88,8 +88,13 @@ final class ShowBuildplanCreator implements ViewControllerInterface
                 $game->setTemplateVar('MODULE_TYPES', $moduleTypes);
 
                 $mod_level = $this->shipRumpModuleLevelRepository->getByShipRump($rump->getId());
+                if ($mod_level === null) {
+                    throw new RuntimeException(sprintf('no module level for rumpId: %d', $rump->getId()));
+                }
 
                 $availableModules = [];
+                $mandatoryModules = [];
+
                 foreach ($moduleTypes as $moduleType) {
                     $moduleTypeId = $moduleType->value;
                     if (
@@ -107,13 +112,27 @@ final class ShowBuildplanCreator implements ViewControllerInterface
                         throw new RuntimeException(sprintf('No ship rump role found for rump %d', $rump->getId()));
                     }
 
-                    $availableModules[$moduleTypeId] = $this->moduleRepository->getByTypeAndLevel(
+                    $modules = $this->moduleRepository->getByTypeAndLevel(
                         $moduleTypeId,
                         $shipRumpRole->getId(),
                         range($min_level, $max_level)
                     );
+
+                    $modules = iterator_to_array($modules);
+
+                    usort($modules, function ($a, $b) {
+                        return $a->getId() <=> $b->getId();
+                    });
+
+                    $availableModules[$moduleTypeId] = $modules;
+
+
+
+                    $mandatoryModules[$moduleTypeId] = $mod_level->{'getModuleMandatory' . $moduleTypeId}() > 0;
                 }
+
                 $game->setTemplateVar('AVAILABLE_MODULES', $availableModules);
+                $game->setTemplateVar('MANDATORY_MODULES', $mandatoryModules);
                 $game->setTemplateVar('SPECIAL_MODULES', $this->moduleRepository->getBySpecialTypeIds(ModuleSpecialAbilityEnum::getValueArray()));
             }
         } else {

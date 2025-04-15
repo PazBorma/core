@@ -17,13 +17,12 @@
       </tr>
     </table>
         <div>
-    <form action="/admin/index.php" method="post" onkeydown="return event.key != 'Enter';">
-        <input type="hidden" name="sstr" value="MOCKED_SESSIONSTRING">
+    <form action="colony.php" method="post" onkeydown="return event.key != 'Enter';">
         <table class="tcal">
             <tr>
                 <th>Sandbox f&Atilde;&frac14;r folgende Kolonie</th>
                 <td>
-                    <select name="cid">
+                    <select id="colony-id">
                                                 <option value="42">Stempor'Arr 4 7|11 (Stempor'Arr-System)</option>
                                             </select>
                 </td>
@@ -31,12 +30,15 @@
             <tr>
                 <th>Name der Sandbox</th>
                 <td>
-                    <input type="text" style="width: 250px" name="name" value="SANDBOX 21 Nov 2024">
+                    <input type="text" style="width: 250px" id="sandbox-name" value="SANDBOX 21 Nov 2024">
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align: center;">
-                    <input type="submit" class="button" name="B_CREATE_SANDBOX" value="Sandbox erstellen">
+                    <div style="text-align: center; margin-top: 10px;" class="fabutton">
+                        <a href="javascript:void(0);" onclick="createNewSandbox('MOCKED_SESSIONSTRING');" class="fabutton">
+                            Sandbox erstellen</a>
+                    </div>
                 </td>
             </tr>
         </table>

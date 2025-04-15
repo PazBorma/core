@@ -3,7 +3,7 @@
 namespace Stu\Module\Control;
 
 use Stu\Component\Game\GameEnum;
-use Stu\Component\Game\ModuleViewEnum;
+use Stu\Component\Game\ModuleEnum;
 use Stu\Lib\Information\InformationInterface;
 use Stu\Lib\Information\InformationWrapper;
 use Stu\Orm\Entity\GameRequestInterface;
@@ -13,7 +13,7 @@ use SysvSemaphore;
 
 interface GameControllerInterface extends InformationInterface
 {
-    public function setView(ModuleViewEnum|string $view): void;
+    public function setView(ModuleEnum|string $view): void;
 
     public function getViewContext(ViewContextTypeEnum $type): mixed;
 
@@ -93,14 +93,8 @@ interface GameControllerInterface extends InformationInterface
 
     public function getGameRequestId(): string;
 
-    /**
-     * @param array<string, ActionControllerInterface> $actions
-     * @param array<string, ViewControllerInterface> $views
-     */
     public function main(
-        ModuleViewEnum $view,
-        array $actions,
-        array $views,
+        ModuleEnum $view,
         bool $session_check = true,
         bool $admin_check = false,
         bool $npc_check = false

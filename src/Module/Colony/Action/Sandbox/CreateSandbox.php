@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Stu\Module\Admin\Action\Sandbox;
+namespace Stu\Module\Colony\Action\Sandbox;
 
 use Override;
 use request;
-use Stu\Module\Admin\View\Sandbox\ShowColonySandbox;
+use Stu\Module\Colony\View\Sandbox\ShowColonySandbox;
+use Stu\Module\Control\AccessCheckControllerInterface;
+use Stu\Module\Control\AccessGrantedFeatureEnum;
 use Stu\Module\Control\ActionControllerInterface;
 use Stu\Module\Control\GameControllerInterface;
 use Stu\Module\Control\ViewContextTypeEnum;
@@ -14,12 +16,21 @@ use Stu\Orm\Entity\ColonyInterface;
 use Stu\Orm\Repository\ColonySandboxRepositoryInterface;
 use Stu\Orm\Repository\PlanetFieldRepositoryInterface;
 
-final class CreateSandbox implements ActionControllerInterface
+final class CreateSandbox implements
+    ActionControllerInterface,
+    AccessCheckControllerInterface
 {
     public const string ACTION_IDENTIFIER = 'B_CREATE_SANDBOX';
 
-    public function __construct(private ColonySandboxRepositoryInterface $colonySandboxRepository, private PlanetFieldRepositoryInterface $planetFieldRepository)
+    public function __construct(
+        private ColonySandboxRepositoryInterface $colonySandboxRepository,
+        private PlanetFieldRepositoryInterface $planetFieldRepository
+    ) {}
+
+    #[Override]
+    public function getFeatureIdentifier(): AccessGrantedFeatureEnum
     {
+        return AccessGrantedFeatureEnum::COLONY_SANDBOX;
     }
 
     #[Override]
@@ -27,12 +38,7 @@ final class CreateSandbox implements ActionControllerInterface
     {
         $game->setView(ShowColonySandbox::VIEW_IDENTIFIER);
 
-        if (!$game->isAdmin()) {
-            $game->addInformation(_('[b][color=#ff2626]Aktion nicht möglich, Spieler ist kein Admin![/color][/b]'));
-            return;
-        }
-
-        $colonyId = request::postIntFatal('cid');
+        $colonyId = request::getIntFatal('cid');
 
         /** @var ColonyInterface|null */
         $colony = $game->getUser()->getColonies()->get($colonyId);
@@ -40,7 +46,7 @@ final class CreateSandbox implements ActionControllerInterface
             return;
         }
 
-        $sandboxName = request::postStringFatal('name');
+        $sandboxName = request::getStringFatal('name');
 
         $sandbox = $this->colonySandboxRepository->prototype();
         $sandbox
@@ -72,7 +78,6 @@ final class CreateSandbox implements ActionControllerInterface
 
         $game->addInformationf(_('Sandbox %s wurde erstellt'), $sandboxName);
 
-        $game->setView(ShowColonySandbox::VIEW_IDENTIFIER);
         $game->setViewContext(ViewContextTypeEnum::HOST, $sandbox);
     }
 

@@ -38,6 +38,7 @@ use Stu\Module\Spacecraft\Action\MoveShip\MoveShipRequestInterface;
 use Stu\Module\Spacecraft\Action\MoveShip\MoveShipRight;
 use Stu\Module\Spacecraft\Action\MoveShip\MoveShipUp;
 use Stu\Module\Spacecraft\Action\OpenAdventDoor\OpenAdventDoor;
+use Stu\Module\Spacecraft\Action\RemoveWaste\RemoveWaste;
 use Stu\Module\Spacecraft\Action\RenameCrew\RenameCrew;
 use Stu\Module\Spacecraft\Action\RenameCrew\RenameCrewRequest;
 use Stu\Module\Spacecraft\Action\RenameCrew\RenameCrewRequestInterface;
@@ -95,6 +96,7 @@ use Stu\Module\Spacecraft\View\ShowSpacecraftDetails\ShowSpacecraftDetails;
 use Stu\Module\Spacecraft\View\ShowSpacecraftStorage\ShowSpacecraftStorage;
 use Stu\Module\Spacecraft\View\ShowSpacecraft\ShowSpacecraft;
 use Stu\Module\Spacecraft\View\ShowSpacecraft\SpacecraftTypeShowStragegyInterface;
+use Stu\Module\Spacecraft\View\ShowWasteMenu\ShowWasteMenu;
 use Stu\Module\Station\View\ShowStation\StationShowStrategy;
 use Stu\Module\Spacecraft\Lib\ActivatorDeactivatorHelper;
 use Stu\Module\Spacecraft\Lib\ActivatorDeactivatorHelperInterface;
@@ -211,6 +213,8 @@ use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\Condition\DriveActiva
 use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\Condition\EnoughEpsCondition;
 use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\Condition\EnoughWarpdriveCondition;
 use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\Condition\PreFlightConditionInterface;
+use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\ConditionCheckResultFactory;
+use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\ConditionCheckResultFactoryInterface;
 use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\PreFlightConditionsCheck;
 use Stu\Module\Spacecraft\Lib\Movement\Component\PreFlight\PreFlightConditionsCheckInterface;
 use Stu\Module\Spacecraft\Lib\Movement\Component\UpdateFlightDirection;
@@ -313,6 +317,7 @@ return [
         autowire(EnoughEpsCondition::class),
         autowire(EnoughWarpdriveCondition::class)
     ],
+    ConditionCheckResultFactoryInterface::class => autowire(ConditionCheckResultFactory::class),
     PreFlightConditionsCheckInterface::class => autowire(PreFlightConditionsCheck::class)
         ->constructorParameter(
             'conditions',
@@ -452,7 +457,8 @@ return [
         ),
         TransferToAccount::ACTION_IDENTIFIER => autowire(TransferToAccount::class),
         TransferFromAccount::ACTION_IDENTIFIER => autowire(TransferFromAccount::class),
-        WarpdriveBoost::ACTION_IDENTIFIER => autowire(WarpdriveBoost::class)
+        WarpdriveBoost::ACTION_IDENTIFIER => autowire(WarpdriveBoost::class),
+        RemoveWaste::ACTION_IDENTIFIER => autowire(RemoveWaste::class)
     ],
     'SPACECRAFT_VIEWS' => [
         ShowAlertLevel::VIEW_IDENTIFIER => autowire(ShowAlertLevel::class),
@@ -475,6 +481,7 @@ return [
         ShowTradeMenu::VIEW_IDENTIFIER => autowire(ShowTradeMenu::class),
         ShowTradeMenuTransfer::VIEW_IDENTIFIER => autowire(ShowTradeMenuTransfer::class),
         ShowTransfer::VIEW_IDENTIFIER => get(ShowTransfer::class),
+        ShowWasteMenu::VIEW_IDENTIFIER => autowire(ShowWasteMenu::class),
         Noop::VIEW_IDENTIFIER => autowire(Noop::class),
     ],
 ];

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
-use Stu\Component\Game\ModuleViewEnum;
+use Stu\Component\Game\ModuleEnum;
 use Stu\Config\Init;
 use Stu\Module\Control\GameControllerInterface;
 
@@ -20,9 +20,7 @@ Init::run(function (ContainerInterface $dic): void {
     $em->beginTransaction();
 
     $dic->get(GameControllerInterface::class)->main(
-        ModuleViewEnum::SHIP,
-        array_merge($dic->get('SPACECRAFT_ACTIONS'), $dic->get('SHIP_ACTIONS')),
-        array_merge($dic->get('SPACECRAFT_VIEWS'), $dic->get('SHIP_VIEWS'))
+        ModuleEnum::SHIP
     );
 
     $em->commit();

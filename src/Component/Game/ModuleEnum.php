@@ -9,7 +9,7 @@ use Stu\Lib\Component\ComponentEnumInterface;
 use Stu\Module\Colony\Component\ColonyComponentEnum;
 use Stu\Module\Game\Component\GameComponentEnum;
 
-enum ModuleViewEnum: string
+enum ModuleEnum: string
 {
     case INDEX = 'index';
     case GAME = 'game';
@@ -25,9 +25,9 @@ enum ModuleViewEnum: string
     case ALLIANCE = 'alliance';
     case DATABASE = 'database';
     case HISTORY = 'history';
-    case MAP = 'starmap';
+    case STARMAP = 'starmap';
     case OPTIONS = 'options';
-    case PROFILE = 'userprofile';
+    case USERPROFILE = 'userprofile';
     case ADMIN = 'admin';
     case NPC = 'npc';
 
@@ -52,10 +52,10 @@ enum ModuleViewEnum: string
             self::ALLIANCE => 'Allianz',
             self::DATABASE => 'Datenbank',
             self::HISTORY => 'Ereignisse',
-            self::MAP => 'Karte',
+            self::STARMAP => 'Karte',
             self::NOTES => 'Notizen',
             self::OPTIONS => 'Optionen',
-            self::PROFILE => 'Spielerprofil',
+            self::USERPROFILE => 'Spielerprofil',
             self::ADMIN => 'Adminbereich',
             self::NPC => 'NPC'
         };
@@ -77,10 +77,10 @@ enum ModuleViewEnum: string
             self::ALLIANCE => 'html/view/alliance.twig',
             self::DATABASE => 'html/view/database.twig',
             self::HISTORY => 'html/view/history.twig',
-            self::MAP => 'html/view/map.twig',
+            self::STARMAP => 'html/view/map.twig',
             self::NOTES => 'not needed',
             self::OPTIONS => 'html/view/options.twig',
-            self::PROFILE => 'html/view/userprofile.twig',
+            self::USERPROFILE => 'html/view/userprofile.twig',
             self::ADMIN => 'not needed',
             self::NPC => 'not needed'
         };
@@ -95,5 +95,14 @@ enum ModuleViewEnum: string
         };
 
         return $result ?? GameComponentEnum::OUTDATED;
+    }
+
+    public function getCommonModule(): ?string
+    {
+        return match ($this) {
+            self::SHIP,
+            self::STATION => 'SPACECRAFT',
+            default => null
+        };
     }
 }

@@ -16,6 +16,7 @@ use Stu\Component\Spacecraft\System\SpacecraftSystemTypeEnum;
 use Stu\Component\Station\Dock\DockModeEnum;
 use Stu\Component\Station\Dock\DockTypeEnum;
 use Stu\Component\Station\StationEnum;
+use Stu\Lib\Map\FieldTypeEffectEnum;
 use Stu\Module\Commodity\CommodityTypeEnum;
 use Stu\Module\Control\ActionControllerInterface;
 use Stu\Module\Control\GameControllerInterface;
@@ -87,6 +88,11 @@ final class BuildConstruction implements ActionControllerInterface
             return;
         }
 
+        if ($ship->getLocation()->getFieldType()->hasEffect(FieldTypeEffectEnum::NO_STATION_CONSTRUCTION)) {
+            $game->addInformation(_('In diesem Sektor kann keine Station errichtet werden'));
+            return;
+        }
+
         // check if ship in wormhole
         if ($ship->getSystem() !== null && $ship->getSystem()->isWormhole()) {
             $game->addInformation(_("In Wurmlöchern können keine Stationen errichtet werden"));
@@ -124,7 +130,7 @@ final class BuildConstruction implements ActionControllerInterface
             $game->addInformation("Schiff befindet sich im Warp");
             return;
         }
-        if ($ship->getShieldState()) {
+        if ($ship->isShielded()) {
             $game->addInformation(_("Die Schilde sind aktiviert"));
             return;
         }

@@ -8,7 +8,7 @@ use Stu\Orm\Entity\MapFieldTypeInterface;
 
 enum FieldTypeEffectEnum: string
 {
-        // leaks
+    // leaks
     case WARPDRIVE_LEAK = 'WARPDRIVE_LEAK';
     case REACTOR_LEAK = 'REACTOR_LEAK';
     case EPS_LEAK = 'EPS_LEAK';
@@ -34,6 +34,8 @@ enum FieldTypeEffectEnum: string
         // other
     case NO_PIRATES = 'NO_PIRATES';
     case NO_ANOMALIES = 'NO_ANOMALIES';
+    case NO_MEASUREPOINT = 'NO_MEASUREPOINT';
+    case NO_STATION_CONSTRUCTION = 'NO_STATION_CONSTRUCTION';
 
         //TODO: following not yet implemented
     case LSS_BLOCKADE = 'LSS_BLOCKADE';
@@ -52,7 +54,7 @@ enum FieldTypeEffectEnum: string
         };
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return match ($this) {
             self::CLOAK_UNUSEABLE => 'Ausfall der Tarnung',
@@ -71,8 +73,7 @@ enum FieldTypeEffectEnum: string
             self::ENERGY_WEAPON_BUFF => 'Steigerung des Energiewaffenschadens',
             self::ENERGY_WEAPON_NERF => 'Minderung des Energiewaffenschadens',
             self::REGENERATION_CHANCE => 'Geringe Chance auf energetischen Bonus',
-            self::NO_ANOMALIES => 'Anomalie-freie Zone',
-            self::NO_PIRATES => 'No-Go-Area für die Kazon'
+            default => null
         };
     }
 
@@ -96,7 +97,7 @@ enum FieldTypeEffectEnum: string
             self::EVADE_CHANCE_INTERFERENCE => sprintf('Asymmetrische Feldverzerrungen durch %s beeinträchtig die Navigationssensoren<br>
             Manövrierbarkeit verringert sich', $fieldTypeName),
             self::ENERGY_WEAPON_BUFF => sprintf('Kohärenzverstärkung durch %s verstärkt den Energiewaffenoutput', $fieldTypeName),
-            self::ENERGY_WEAPON_NERF => sprintf('Dekohärenz durch %s verstärkt den Energiewaffenoutput', $fieldTypeName),
+            self::ENERGY_WEAPON_NERF => sprintf('Dekohärenz durch %s verringert den Energiewaffenoutput', $fieldTypeName),
             default => null
         };
     }

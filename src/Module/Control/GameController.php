@@ -8,7 +8,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use request;
 use RuntimeException;
 use Stu\Component\Game\GameEnum;
-use Stu\Component\Game\ModuleViewEnum;
+use Stu\Component\Game\ModuleEnum;
 use Stu\Component\Logging\GameRequest\GameRequestSaverInterface;
 use Stu\Exception\AccessViolation;
 use Stu\Exception\EntityLockedException;
@@ -60,6 +60,8 @@ final class GameController implements GameControllerInterface
     private LoggerUtilInterface $loggerUtil;
 
     public function __construct(
+        private ControllerDiscovery $controllerDiscovery,
+        private AccessCheckInterface $accessCheck,
         private SessionInterface $session,
         private SessionStringRepositoryInterface $sessionStringRepository,
         private TwigPageInterface $twigPage,
@@ -90,9 +92,9 @@ final class GameController implements GameControllerInterface
     }
 
     #[Override]
-    public function setView(ModuleViewEnum|string $view): void
+    public function setView(ModuleEnum|string $view): void
     {
-        if ($view instanceof ModuleViewEnum) {
+        if ($view instanceof ModuleEnum) {
             $this->setViewContext(ViewContextTypeEnum::MODULE_VIEW, $view);
         } else {
             $this->setViewContext(ViewContextTypeEnum::VIEW, $view);
@@ -433,17 +435,15 @@ final class GameController implements GameControllerInterface
 
     #[Override]
     public function main(
-        ModuleViewEnum $view,
-        array $actions,
-        array $views,
+        ModuleEnum $module,
         bool $session_check = true,
         bool $admin_check = false,
         bool $npc_check = false,
     ): void {
-        $this->setViewContext(ViewContextTypeEnum::MODULE_VIEW, $view);
+        $this->setViewContext(ViewContextTypeEnum::MODULE_VIEW, $module);
 
         $gameRequest = $this->getGameRequest();
-        $gameRequest->setModule($view->value);
+        $gameRequest->setModule($module->value);
 
         try {
             $this->session->createSession($session_check);
@@ -452,14 +452,14 @@ final class GameController implements GameControllerInterface
                 $this->session->checkLoginCookie();
             }
 
-            if ($view === ModuleViewEnum::NPC) {
+            if ($module === ModuleEnum::NPC) {
                 if (!$this->isNpc() && !$this->isAdmin()) {
                     header('Location: /');
                     exit;
                 }
             }
 
-            if ($view === ModuleViewEnum::ADMIN) {
+            if ($module === ModuleEnum::ADMIN) {
                 if (!$this->isAdmin()) {
                     header('Location: /');
                     exit;
@@ -471,7 +471,7 @@ final class GameController implements GameControllerInterface
             // log action & view and time they took
             $startTime = hrtime(true);
             try {
-                $this->executeCallback($actions, $gameRequest);
+                $this->executeCallback($module, $gameRequest);
             } catch (SanityCheckException $e) {
                 $gameRequest->addError($e);
             } catch (EntityLockedException $e) {
@@ -481,7 +481,7 @@ final class GameController implements GameControllerInterface
 
             $startTime = hrtime(true);
             try {
-                $this->executeView($views, $gameRequest);
+                $this->executeView($module, $gameRequest);
             } catch (SanityCheckException $e) {
                 $gameRequest->addError($e);
             } catch (EntityLockedException $e) {
@@ -647,45 +647,50 @@ final class GameController implements GameControllerInterface
         $this->eventDispatcher->dispatch($event);
     }
 
-    /**
-     * @param array<string, ActionControllerInterface> $actions
-     */
-    private function executeCallback(array $actions, GameRequestInterface $gameRequest): void
+    private function executeCallback(ModuleEnum $module, GameRequestInterface $gameRequest): void
     {
-        foreach ($actions as $actionIdentifier => $actionController) {
+        $actions = $this->controllerDiscovery->getControllers($module, false);
+
+        foreach ($actions as $actionIdentifier => $controller) {
             if (request::has($actionIdentifier)) {
                 $gameRequest->setAction($actionIdentifier);
 
-                if ($actionController->performSessionCheck() === true && !request::isPost() && !$this->sessionStringRepository->isValid(
-                    (string)request::indString('sstr'),
-                    $this->getUser()->getId()
-                )) {
+                if (
+                    $controller instanceof ActionControllerInterface
+                    && $controller->performSessionCheck() === true
+                    && !request::isPost() && !$this->sessionStringRepository->isValid(
+                        (string)request::indString('sstr'),
+                        $this->getUser()->getId()
+                    )
+                ) {
                     return;
                 }
-                $actionController->handle($this);
 
-                $this->entityManager->flush();
+                if ($this->accessCheck->checkUserAccess($controller, $this)) {
+                    $controller->handle($this);
+                    $this->entityManager->flush();
+                }
             }
         }
     }
 
-    /**
-     * @param array<string, ViewControllerInterface> $views
-     */
-    private function executeView(array $views, GameRequestInterface $gameRequest): void
+    private function executeView(ModuleEnum $module, GameRequestInterface $gameRequest): void
     {
         $viewFromContext = $this->getViewContext(ViewContextTypeEnum::VIEW);
 
-        foreach ($views as $viewIdentifier => $view) {
+        $views = $this->controllerDiscovery->getControllers($module, true);
+
+        foreach ($views as $viewIdentifier => $controller) {
             if (
                 request::indString($viewIdentifier) !== false
                 || $viewIdentifier === $viewFromContext
             ) {
                 $gameRequest->setView($viewIdentifier);
 
-                $this->handleView($view);
-
-                return;
+                if ($this->accessCheck->checkUserAccess($controller, $this)) {
+                    $this->handleView($controller);
+                    return;
+                }
             }
         }
 
@@ -696,7 +701,7 @@ final class GameController implements GameControllerInterface
         }
     }
 
-    private function handleView(ViewControllerInterface $view): void
+    private function handleView(ControllerInterface $view): void
     {
         $view->handle($this);
 
