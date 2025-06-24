@@ -45,7 +45,7 @@
     "devster/ubench": "^2",
     "doctrine/annotations": "^2.0",
     "doctrine/migrations": "^3.8",
-    "doctrine/orm": "3.2.1",
+    "doctrine/orm": "^3.2.1",
     "filp/whoops": "^2.5",
     "graphp/graphviz": "^0.2.1",
     "hackzilla/password-generator": "^1.4",
@@ -55,8 +55,10 @@
     "mnsami/composer-custom-directory-installer": "^2",
     "monolog/monolog": "^3",
     "mpscholten/request-parser": "^1.5",
+    "pazborma/stuniverse-utility": "^1.0",
     "php-di/php-di": "^7",
     "sebastian/diff": "^7.0",
+    "slam/dbal-debugstack-middleware": "^2.1",
     "st-universe/planet-generator": "dev-master",
     "st-universe/starsystem-generator": "dev-master",
     "symfony/mailer": "^7.1.5",
@@ -66,6 +68,7 @@
     "bnf/phpstan-psr-container": "^1.0",
     "enlightn/security-checker": "^2.0",
     "friendsofphp/php-cs-fixer": "^3.13",
+    "laravel/sail": "^1.41",
     "mikey179/vfsstream": "1.6.11",
     "mockery/mockery": "^1.1",
     "phpstan/extension-installer": "^1.4.3",
@@ -98,7 +101,14 @@
     {
       "type": "git",
       "url": "https://github.com/st-universe/starsystem-generator.git"
-    }
+    },
+      {
+          "type": "path",
+          "url": "packages/pazborma/stuniverse-utility",
+          "options": {
+              "symlink": true
+          }
+      }
   ],
   "scripts": {
     "orm:proxies": "./bin/doctrine orm:generate-proxies",

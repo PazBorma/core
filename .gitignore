@@ -7,6 +7,7 @@ docu/de/_build/*
 vendor
 config.json
 config.json.backup
+packages
 config.intttest.json
 src/Public/assets
 src/Public/version_*
