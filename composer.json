@@ -55,6 +55,7 @@
     "mnsami/composer-custom-directory-installer": "^2",
     "monolog/monolog": "^3",
     "mpscholten/request-parser": "^1.5",
+    "pazborma/stuniverse-utility": "^1.0",
     "php-di/php-di": "^7",
     "sebastian/diff": "^7.0",
     "slam/dbal-debugstack-middleware": "^2.1",
@@ -100,7 +101,14 @@
     {
       "type": "git",
       "url": "https://github.com/st-universe/starsystem-generator.git"
-    }
+    },
+      {
+          "type": "path",
+          "url": "packages/pazborma/stuniverse-utility",
+          "options": {
+              "symlink": true
+          }
+      }
   ],
   "scripts": {
     "orm:proxies": "./bin/doctrine orm:generate-proxies",
