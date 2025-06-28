@@ -55,7 +55,7 @@
     "mnsami/composer-custom-directory-installer": "^2",
     "monolog/monolog": "^3",
     "mpscholten/request-parser": "^1.5",
-    "pazborma/stuniverse-utility": "^1.0",
+    "pazborma/stuniverse-utility": "dev-main",
     "php-di/php-di": "^7",
     "sebastian/diff": "^7.0",
     "slam/dbal-debugstack-middleware": "^2.1",
