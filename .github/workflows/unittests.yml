@@ -2,7 +2,7 @@ name: Unittests
 
 on:
   push:
-    branches: [ dev, master ]
+    branches: []
   pull_request:
     branches: [ dev, master ]
 
@@ -37,7 +37,7 @@ jobs:
 
       - name: Set env
         run: echo "PHP_CS_FIXER_IGNORE_ENV=1" >> $GITHUB_ENV
-        
+
       - name: Install Dependencies (ignore platform)
         uses: nick-invision/retry@v1
         with:
